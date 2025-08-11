@@ -16,27 +16,6 @@ services:
       timeout: 5s
       retries: 5
 
-  web:
-    build: .
-    container_name: finance_web
-    environment:
-      - DATABASE_URL=postgresql://financeuser:financepass@postgres:5432/financedb
-      - SECRET_KEY=your-secret-key-change-in-production
-      - FLASK_ENV=development
-    volumes:
-      - ./static/uploads:/app/static/uploads
-    ports:
-      - "5000:5000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
   redis:
     image: redis:7-alpine
     container_name: finance_redis
@@ -50,6 +29,30 @@ services:
       timeout: 5s
       retries: 5
 
+  web:
+    image: yourusername/personal-finance-tracker:latest  # Replace with your Docker Hub username
+    container_name: finance_web
+    environment:
+      - DATABASE_URL=postgresql://financeuser:financepass@postgres:5432/financedb
+      - SECRET_KEY=your-secret-key-change-in-production
+      - FLASK_ENV=production
+    volumes:
+      - upload_data:/app/static/uploads
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
 volumes:
   postgres_data:
   redis_data:
+  upload_data:

@@ -1,0 +1,124 @@
+Personal Finance Tracker - Kubernetes Architecture
+==================================================
+
+                                    ┌─────────────────┐
+                                    │  User/Browser   │
+                                    └─────────┬───────┘
+                                              │ HTTP Request
+                                              ▼
+                    ┌─────────────────────────────────────────────────────┐
+                    │                MINIKUBE NODE                        │
+                    │                                                     │
+                    │  ┌─────────────────────────────────────────────┐   │
+                    │  │           finance-app NAMESPACE             │   │
+                    │  │                                             │   │
+                    │  │  ┌─────────────────┐                       │   │
+                    │  │  │ NodePort Service│                       │   │
+                    │  │  │    :30080       │                       │   │
+                    │  │  └─────────┬───────┘                       │   │
+                    │  │            │ Load Balance                  │   │
+                    │  │            ▼                               │   │
+                    │  │  ┌─────────────────────────────────────┐   │   │
+                    │  │  │        Flask Application            │   │   │
+                    │  │  │         (Deployment)                │   │   │
+                    │  │  │                                     │   │   │
+                    │  │  │ ┌─────────────┐ ┌─────────────┐     │   │   │
+                    │  │  │ │  App Pod 1  │ │  App Pod 2  │     │   │   │
+                    │  │  │ │   :5000     │ │   :5000     │     │   │   │
+                    │  │  │ └─────────────┘ └─────────────┘     │   │   │
+                    │  │  └─────────────────────────────────────┘   │   │
+                    │  │            │                 │             │   │
+                    │  │            │ Database Queries│             │   │
+                    │  │            ▼                 ▼             │   │
+                    │  │  ┌─────────────────┐ ┌─────────────────┐   │   │
+                    │  │  │PostgreSQL Service│ │ Redis Service   │   │   │
+                    │  │  │   (Headless)    │ │  (ClusterIP)    │   │   │
+                    │  │  │     :5432       │ │     :6379       │   │   │
+                    │  │  └─────────┬───────┘ └─────────┬───────┘   │   │
+                    │  │            │                   │           │   │
+                    │  │            ▼                   ▼           │   │
+                    │  │  ┌─────────────────┐ ┌─────────────────┐   │   │
+                    │  │  │   postgres-0    │ │   Redis Pod     │   │   │
+                    │  │  │  (StatefulSet)  │ │ (Deployment)    │   │   │
+                    │  │  │     :5432       │ │     :6379       │   │   │
+                    │  │  └─────────┬───────┘ └─────────────────┘   │   │
+                    │  │            │                               │   │
+                    │  │            ▼                               │   │
+                    │  │  ┌─────────────────┐                       │   │
+                    │  │  │PostgreSQL PVC   │                       │   │
+                    │  │  │     5Gi         │                       │   │
+                    │  │  └─────────┬───────┘                       │   │
+                    │  │            │                               │   │
+                    │  │            ▼                               │   │
+                    │  │  ┌─────────────────┐                       │   │
+                    │  │  │PostgreSQL PV    │                       │   │
+                    │  │  │     5Gi         │                       │   │
+                    │  │  └─────────┬───────┘                       │   │
+                    │  └────────────┼───────────────────────────────┘   │
+                    │               │                                   │
+                    │               ▼                                   │
+                    │  ┌─────────────────┐                             │
+                    │  │ /data/postgres  │                             │
+                    │  │   (hostPath)    │                             │
+                    │  └─────────────────┘                             │
+                    └─────────────────────────────────────────────────────┘
+
+Configuration Management:
+========================
+
+┌─────────────────┐    ┌─────────────────┐
+│   ConfigMap     │    │     Secret      │
+│                 │    │                 │
+│ • FLASK_ENV     │    │ • postgres-     │
+│ • UPLOAD_FOLDER │    │   password      │
+│ • POSTGRES_DB   │    │ • secret-key    │
+│ • POSTGRES_USER │    │ • database-url  │
+│ • REDIS_URL     │    │                 │
+└─────────┬───────┘    └─────────┬───────┘
+          │                      │
+          └──────────┬───────────┘
+                     │
+                     ▼
+          ┌─────────────────────┐
+          │  Environment Vars   │
+          │  Injected into:     │
+          │  • Flask App Pods   │
+          │  • PostgreSQL Pod   │
+          └─────────────────────┘
+
+Data Flow:
+==========
+
+1. User Request Flow:
+   User → Minikube:30080 → NodePort → Flask Pods
+
+2. Database Operations:
+   Flask Pods → PostgreSQL Service → postgres-0 → PVC → PV → Host Storage
+
+3. Cache Operations:
+   Flask Pods → Redis Service → Redis Pod
+
+4. File Uploads:
+   Flask Pods → Uploads PVC → Uploads PV → Host Storage
+
+5. Configuration:
+   ConfigMap/Secret → Environment Variables → All Pods
+
+Network Ports:
+==============
+• External Access: 30080 (NodePort)
+• Flask App: 5000 (Internal)
+• PostgreSQL: 5432 (Internal + 30432 NodePort for debug)
+• Redis: 6379 (Internal only)
+
+Storage:
+========
+• PostgreSQL: 5Gi (ReadWriteOnce)
+• File Uploads: 2Gi (ReadWriteMany)
+• Host Paths: /data/postgres, /data/uploads
+
+Resource Limits:
+================
+• Flask App: 250m CPU, 256Mi RAM (request) | 500m CPU, 512Mi RAM (limit)
+• PostgreSQL: 250m CPU, 256Mi RAM (request) | 500m CPU, 512Mi RAM (limit)
+• Redis: 100m CPU, 128Mi RAM (request) | 200m CPU, 256Mi RAM (limit)

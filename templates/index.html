@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Personal Finance Tracker{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto text-center">
+        <h1 class="display-4 mb-4">Personal Finance Tracker</h1>
+        <p class="lead mb-4">Take control of your finances with our easy-to-use expense tracking application.</p>
+        
+        {% if not current_user.is_authenticated %}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">New User?</h5>
+                        <p class="card-text">Create an account to start tracking your expenses and income.</p>
+                        <a href="{{ url_for('main.register') }}" class="btn btn-primary">Register Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Existing User?</h5>
+                        <p class="card-text">Login to access your financial dashboard and transactions.</p>
+                        <a href="{{ url_for('main.login') }}" class="btn btn-outline-primary">Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-12">
+        <h2 class="text-center mb-4">Features</h2>
+    </div>
+    <div class="col-md-4">
+        <div class="text-center">
+            <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+            <h4>Track Expenses</h4>
+            <p>Monitor your spending across different categories and see where your money goes.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="text-center">
+            <i class="fas fa-receipt fa-3x text-success mb-3"></i>
+            <h4>Upload Receipts</h4>
+            <p>Store receipt images with your transactions for better record keeping.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="text-center">
+            <i class="fas fa-chart-pie fa-3x text-info mb-3"></i>
+            <h4>Financial Insights</h4>
+            <p>Get detailed reports and insights about your financial habits and trends.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

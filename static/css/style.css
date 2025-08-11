@@ -88,6 +88,118 @@ body {
     margin-top: 0.5rem;
 }
 
+/* Current receipt display */
+.current-receipt {
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+}
+
+/* Action buttons */
+.btn-group .btn {
+    margin-right: 0;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Transaction row hover effect */
+.transaction-row:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Filter buttons */
+.btn-group button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Modal enhancements */
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+}
+
+/* Loading states */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Category color indicators */
+.category-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+/* Enhanced table styling */
+.table-responsive {
+    border-radius: 0.375rem;
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Pagination styling */
+.pagination .page-link {
+    color: #007bff;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+/* Search and filter section */
+.search-filter-section {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Transaction details in modal */
+.transaction-details {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    border-left: 4px solid #ffc107;
+}
+
+/* Receipt download button */
+.receipt-download {
+    transition: all 0.2s ease;
+}
+
+.receipt-download:hover {
+    transform: scale(1.1);
+}
+
+/* Empty state styling */
+.empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .navbar-nav {
@@ -100,6 +212,25 @@ body {
     
     .table-responsive {
         font-size: 0.875rem;
+    }
+    
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-group .btn {
+        margin-bottom: 0.25rem;
+    }
+    
+    .d-md-flex {
+        flex-direction: column;
+    }
+    
+    .d-md-flex .btn {
+        margin-bottom: 0.5rem;
+        width: 100%;
     }
 }
 
@@ -115,11 +246,32 @@ body {
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
-/* Category color indicators */
-.category-indicator {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 0.5rem;
+/* Success and error states */
+.is-valid {
+    border-color: #28a745;
+}
+
+.is-invalid {
+    border-color: #dc3545;
+}
+
+/* Tooltip styling */
+.tooltip {
+    font-size: 0.875rem;
+}
+
+/* Animation for new transactions */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.new-transaction {
+    animation: slideIn 0.3s ease-out;
 }

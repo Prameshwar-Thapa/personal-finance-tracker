@@ -187,6 +187,28 @@ kubectl logs -f deployment/finance-app -n finance-app
 kubectl scale deployment finance-app --replicas=3 -n finance-app
 ```
 
+## 🛠️ Development Scripts
+
+The project includes several utility scripts for development and testing:
+
+### **Sample Data Population**
+```bash
+# Populate database with realistic sample data
+python scripts/populate_sample_data.py
+```
+
+### **Setup Validation**
+```bash
+# Validate Flask configuration and file structure
+python scripts/validate_setup.py
+```
+
+### **Performance Benchmarking**
+```bash
+# Run database and application performance tests
+python scripts/performance_benchmark.py
+```
+
 ## 🧪 Testing
 
 ### Run Tests Locally

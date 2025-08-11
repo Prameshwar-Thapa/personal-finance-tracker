@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app, send_file
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
 from app import db
@@ -167,6 +167,82 @@ def transactions():
                                   .paginate(page=page, per_page=20, error_out=False)
     
     return render_template('transactions.html', transactions=transactions)
+
+@main.route('/edit_transaction/<int:transaction_id>', methods=['GET', 'POST'])
+@login_required
+def edit_transaction(transaction_id):
+    transaction = Transaction.query.filter_by(id=transaction_id, user_id=current_user.id).first_or_404()
+    
+    form = TransactionForm(obj=transaction)
+    
+    # Populate category choices
+    categories = Category.query.filter_by(user_id=current_user.id).all()
+    form.category_id.choices = [(c.id, c.name) for c in categories]
+    
+    if form.validate_on_submit():
+        # Handle file upload if new receipt is provided
+        if form.receipt.data:
+            # Delete old receipt if exists
+            if transaction.receipt_filename:
+                old_file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], str(current_user.id), transaction.receipt_filename)
+                if os.path.exists(old_file_path):
+                    os.remove(old_file_path)
+            
+            # Save new receipt
+            receipt_filename = save_receipt_file(form.receipt.data, current_user.id)
+            transaction.receipt_filename = receipt_filename
+        
+        # Update transaction fields
+        transaction.amount = form.amount.data
+        transaction.description = form.description.data
+        transaction.transaction_type = form.transaction_type.data
+        transaction.date = form.date.data
+        transaction.category_id = form.category_id.data if form.category_id.data else None
+        transaction.notes = form.notes.data
+        
+        db.session.commit()
+        flash('Transaction updated successfully!', 'success')
+        return redirect(url_for('main.transactions'))
+    
+    return render_template('edit_transaction.html', form=form, transaction=transaction)
+
+@main.route('/delete_transaction/<int:transaction_id>', methods=['POST'])
+@login_required
+def delete_transaction(transaction_id):
+    transaction = Transaction.query.filter_by(id=transaction_id, user_id=current_user.id).first_or_404()
+    
+    # Delete associated receipt file if exists
+    if transaction.receipt_filename:
+        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], str(current_user.id), transaction.receipt_filename)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        
+        # Delete thumbnail if exists
+        thumb_path = os.path.join(current_app.config['UPLOAD_FOLDER'], str(current_user.id), 'thumbnails', transaction.receipt_filename)
+        if os.path.exists(thumb_path):
+            os.remove(thumb_path)
+    
+    db.session.delete(transaction)
+    db.session.commit()
+    flash('Transaction deleted successfully!', 'success')
+    return redirect(url_for('main.transactions'))
+
+@main.route('/download_receipt/<int:transaction_id>')
+@login_required
+def download_receipt(transaction_id):
+    transaction = Transaction.query.filter_by(id=transaction_id, user_id=current_user.id).first_or_404()
+    
+    if not transaction.receipt_filename:
+        flash('No receipt found for this transaction.', 'error')
+        return redirect(url_for('main.transactions'))
+    
+    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], str(current_user.id), transaction.receipt_filename)
+    
+    if not os.path.exists(file_path):
+        flash('Receipt file not found.', 'error')
+        return redirect(url_for('main.transactions'))
+    
+    return send_file(file_path, as_attachment=True, download_name=f"receipt_{transaction.description}_{transaction.date}.{transaction.receipt_filename.split('.')[-1]}")
 
 @main.route('/api/transactions')
 @login_required
