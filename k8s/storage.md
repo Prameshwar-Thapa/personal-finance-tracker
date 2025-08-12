@@ -52,6 +52,14 @@ echo "OIDC Issuer: $OIDC_ISSUER"
 # Extract OIDC ID (the last part of the URL)
 OIDC_ID=$(echo $OIDC_ISSUER | cut -d '/' -f 5)
 echo "OIDC ID: $OIDC_ID"
+
+### **Step 2: Delete the unused OIDC provider**
+
+bash
+# Delete the old OIDC provider
+aws iam delete-open-id-connect-provider \
+    --open-id-connect-provider-arn arn:aws:iam::142595748980:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/A369568D1731D2FD89B4B591846AFA4D
+
 ```
 
 ### Step 1.2: Check if OIDC Provider Already Exists
