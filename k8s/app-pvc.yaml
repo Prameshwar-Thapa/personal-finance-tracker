@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uploads-pvc
+  namespace: finance-tracker
+  labels:
+    app: finance-tracker
+    component: storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: finance-tracker-storage
+  resources:
+    requests:
+      storage: 10Gi

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: finance-app-service
+  namespace: finance-tracker
+  labels:
+    app: finance-app
+spec:
+  type: ClusterIP
+  selector:
+    app: finance-app
+  ports:
+  - port: 80
+    targetPort: 5000
+    protocol: TCP
+    name: http

@@ -2,27 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: finance-app
-  namespace: finance-app
-  labels:
-    app: finance-app
-    component: web
+  namespace: finance-tracker
 spec:
   replicas: 2
   selector:
     matchLabels:
       app: finance-app
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
   template:
     metadata:
       labels:
         app: finance-app
-        component: web
     spec:
-      serviceAccountName: finance-app-sa
       initContainers:
       - name: wait-for-postgres
         image: postgres:13
@@ -39,25 +29,23 @@ spec:
           valueFrom:
             secretKeyRef:
               name: finance-app-secrets
-              key: POSTGRES_PASSWORD  # Fixed key name
+              key: postgres-password
       containers:
       - name: finance-app
         image: prameshwar884/personal-finance-tracker-web:latest
         ports:
         - containerPort: 5000
-          name: http
         env:
-        # Use DATABASE_URL from configmap (it's already properly formatted)
         - name: DATABASE_URL
           valueFrom:
-            configMapKeyRef:
-              name: finance-app-config
-              key: DATABASE_URL
+            secretKeyRef:
+              name: finance-app-secrets
+              key: database-url
         - name: SECRET_KEY
           valueFrom:
             secretKeyRef:
               name: finance-app-secrets
-              key: SECRET_KEY  # Fixed key name
+              key: secret-key
         - name: FLASK_ENV
           valueFrom:
             configMapKeyRef:
@@ -68,11 +56,6 @@ spec:
             configMapKeyRef:
               name: finance-app-config
               key: UPLOAD_FOLDER
-        - name: MAX_CONTENT_LENGTH
-          valueFrom:
-            configMapKeyRef:
-              name: finance-app-config
-              key: MAX_CONTENT_LENGTH
         volumeMounts:
         - name: uploads-storage
           mountPath: /app/static/uploads
@@ -82,16 +65,12 @@ spec:
             port: 5000
           initialDelaySeconds: 60
           periodSeconds: 30
-          timeoutSeconds: 5
-          failureThreshold: 3
         readinessProbe:
           httpGet:
             path: /health
             port: 5000
           initialDelaySeconds: 30
           periodSeconds: 10
-          timeoutSeconds: 3
-          failureThreshold: 3
         resources:
           requests:
             memory: "256Mi"
@@ -102,4 +81,4 @@ spec:
       volumes:
       - name: uploads-storage
         persistentVolumeClaim:
-          claimName: uploads-pvc-fixed  # Use the fixed PVC
+          claimName: uploads-pvc

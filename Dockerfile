@@ -29,7 +29,8 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy application code from builder
 COPY --from=builder /app /app
 
-# Make startup script executable
+# Copy and make startup script executable
+COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
 # Create directories for uploads and ensure proper permissions

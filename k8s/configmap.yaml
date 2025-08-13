@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: finance-app-config
+  namespace: finance-tracker
+data:
+  FLASK_ENV: "production"
+  UPLOAD_FOLDER: "/app/static/uploads/receipts"
+  MAX_CONTENT_LENGTH: "16777216"  # 16MB
+  POSTGRES_DB: "financedb"
+  POSTGRES_USER: "financeuser"
+  REDIS_URL: "redis://redis-service:6379/0"
