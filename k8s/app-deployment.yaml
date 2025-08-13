@@ -32,7 +32,7 @@ spec:
               key: postgres-password
       containers:
       - name: finance-app
-        image: prameshwar884/personal-finance-tracker-web:16949532332
+        image: prameshwar884/personal-finance-tracker-web:16950058153
         ports:
         - containerPort: 5000
         env:
