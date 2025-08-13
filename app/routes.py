@@ -263,4 +263,4 @@ def health_check():
         'status': 'healthy',
         'timestamp': datetime.utcnow().isoformat(),
         'version': '1.0.0'
-    })
+    }) 
