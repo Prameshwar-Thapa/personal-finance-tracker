@@ -69,10 +69,19 @@ aws iam list-open-id-connect-providers
 
 # Check if your specific OIDC provider exists
 aws iam get-open-id-connect-provider \
-    --open-id-connect-provider-arn "arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):oidc-provider/oidc.eks.$REGION.amazonaws.com/id/$OIDC_ID" 2>/dev/null || echo "OIDC Provider does not exist"
-```
+    --open-id-connect-provider-arn "arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):oidc-provider/oidc.eks.$REGION.amazonaws.com/id/$OIDC_ID" 2>/dev/null || echo "OIDC
 
-### Step 1.3: Create OIDC Provider (if it doesn't exist)
+Provider does not exist"
+
+```
+### Step 1.3: Attached OIDC Provider to your cluster if already exist
+
+eksctl utils associate-iam-oidc-provider \
+  --cluster my-cluster \
+  --region us-east-1 \
+  --approve
+
+### Step 1.4: Create OIDC Provider (if it doesn't exist)
 ```bash
 # Create OIDC provider
 aws iam create-open-id-connect-provider \
