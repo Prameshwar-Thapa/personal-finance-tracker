@@ -63,3 +63,14 @@ instance/
 .coverage
 htmlcov/
 .pytest_cache/
+
+# Kubernetes Secrets (SECURITY)
+k8s/secrets.yaml
+!k8s/secrets.yaml.template
+
+# Sensitive Configuration Files
+*.pem
+*.key
+*secret*
+!*secret*.template
+!*secret*.example

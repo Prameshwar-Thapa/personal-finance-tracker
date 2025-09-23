@@ -17,6 +17,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   redis:
     image: redis:7-alpine
@@ -30,17 +31,18 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   web:
-    build: .
+    image: prameshwar884/personal-finance-tracker-web:16950058153
     container_name: finance_web
     environment:
       - DATABASE_URL=postgresql://financeuser:financepass@postgres:5432/financedb
       - SECRET_KEY=your-secret-key-change-in-production
-      - FLASK_ENV=development
+      - FLASK_ENV=production
       - REDIS_URL=redis://redis:6379/0
     volumes:
-      - ./static/uploads:/app/static/uploads
+      - uploads_data:/app/static/uploads
     ports:
       - "5000:5000"
     depends_on:
@@ -48,7 +50,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   postgres_data:
   redis_data:
+  uploads_data:
