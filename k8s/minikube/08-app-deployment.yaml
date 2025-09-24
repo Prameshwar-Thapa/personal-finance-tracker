@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finance-app
+  namespace: finance-tracker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: finance-app
+  template:
+    metadata:
+      labels:
+        app: finance-app
+    spec:
+      initContainers:
+      - name: wait-for-postgres
+        image: postgres:13
+        command: ['sh', '-c']
+        args:
+        - |
+          until pg_isready -h postgres-service -p 5432 -U financeuser; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+          echo "PostgreSQL is ready!"
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: finance-app-secrets
+              key: postgres-password
+      containers:
+      - name: finance-app
+        image: prameshwar884/personal-finance-tracker-web:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: finance-app-secrets
+              key: database-url
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: finance-app-secrets
+              key: secret-key
+        - name: FLASK_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: finance-app-config
+              key: FLASK_ENV
+        - name: UPLOAD_FOLDER
+          valueFrom:
+            configMapKeyRef:
+              name: finance-app-config
+              key: UPLOAD_FOLDER
+        volumeMounts:
+        - name: uploads-storage
+          mountPath: /app/static/uploads
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: uploads-storage
+        persistentVolumeClaim:
+          claimName: uploads-pvc

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: finance-app-config
+  namespace: finance-tracker
+data:
+  FLASK_ENV: "production"
+  UPLOAD_FOLDER: "/app/static/uploads"
+  POSTGRES_DB: "financedb"
+  POSTGRES_USER: "financeuser"
