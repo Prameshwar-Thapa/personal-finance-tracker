@@ -74,3 +74,11 @@ k8s/secrets.yaml
 *secret*
 !*secret*.template
 !*secret*.example
+
+# AWS-specific files
+ebs-csi-trust-policy*.json
+*trust-policy*.json
+
+# Account-specific configurations
+*account-id*
+*oidc-provider*

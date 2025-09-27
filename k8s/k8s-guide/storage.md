@@ -58,7 +58,7 @@ echo "OIDC ID: $OIDC_ID"
 bash
 # Delete the old OIDC provider
 aws iam delete-open-id-connect-provider \
-    --open-id-connect-provider-arn arn:aws:iam::142595748980:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/A369568D1731D2FD89B4B591846AFA4D
+    --open-id-connect-provider-arn arn:aws:iam::YOUR_AWS_ACCOUNT_ID:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/YOUR_OIDC_PROVIDER_ID
 
 ```
 
@@ -598,13 +598,13 @@ aws iam list-open-id-connect-providers
 # {
 #     "OpenIDConnectProviderList": [
 #         {
-#             "Arn": "arn:aws:iam::142595748980:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/31E0BE0E48C6BF612967EBEEE5C91B31"
+#             "Arn": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/YOUR_OIDC_PROVIDER_ID"
 #         }
 #     ]
 # }
 
 # Extract OIDC ID from ARN (last part after /id/)
-OIDC_ID="31E0BE0E48C6BF612967EBEEE5C91B31"  # From the ARN above
+OIDC_ID="YOUR_OIDC_PROVIDER_ID"  # From the ARN above
 ```
 
 #### Method 2: Find Cluster by OIDC ID
@@ -618,10 +618,10 @@ done
 
 # Example output:
 # Cluster: my-cluster
-# https://oidc.eks.us-east-1.amazonaws.com/id/31E0BE0E48C6BF612967EBEEE5C91B31
+# https://oidc.eks.us-east-1.amazonaws.com/id/YOUR_OIDC_PROVIDER_ID
 # ---
 # Cluster: another-cluster
-# https://oidc.eks.us-east-1.amazonaws.com/id/A369568D1731D2FD89B4B591846AFA4D
+# https://oidc.eks.us-east-1.amazonaws.com/id/YOUR_OIDC_PROVIDER_ID
 # ---
 ```
 
@@ -650,7 +650,7 @@ aws iam get-open-id-connect-provider \
 ### OIDC Provider Details
 ```bash
 # Get detailed information about an OIDC provider
-OIDC_PROVIDER_ARN="arn:aws:iam::142595748980:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/31E0BE0E48C6BF612967EBEEE5C91B31"
+OIDC_PROVIDER_ARN="arn:aws:iam::YOUR_AWS_ACCOUNT_ID:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/YOUR_OIDC_PROVIDER_ID"
 
 aws iam get-open-id-connect-provider --open-id-connect-provider-arn $OIDC_PROVIDER_ARN
 
@@ -673,7 +673,7 @@ Deleting an OIDC provider will break all IAM roles that depend on it. This inclu
 ### Step 1: Check What Uses the OIDC Provider
 ```bash
 # Find all IAM roles that trust this OIDC provider
-OIDC_ID="31E0BE0E48C6BF612967EBEEE5C91B31"
+OIDC_ID="YOUR_OIDC_PROVIDER_ID"
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 
 echo "Checking which IAM roles use this OIDC provider..."
@@ -699,7 +699,7 @@ aws iam delete-role --role-name AmazonEKS_EBS_CSI_DriverRole
 ### Step 3: Delete OIDC Provider
 ```bash
 # Delete the OIDC provider
-OIDC_PROVIDER_ARN="arn:aws:iam::142595748980:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/31E0BE0E48C6BF612967EBEEE5C91B31"
+OIDC_PROVIDER_ARN="arn:aws:iam::YOUR_AWS_ACCOUNT_ID:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/YOUR_OIDC_PROVIDER_ID"
 
 aws iam delete-open-id-connect-provider --open-id-connect-provider-arn $OIDC_PROVIDER_ARN
 
@@ -851,13 +851,13 @@ aws iam create-role \
     {
       "Effect": "Allow",
       "Principal": {
-        "Federated": "arn:aws:iam::142595748980:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/31E0BE0E48C6BF612967EBEEE5C91B31"
+        "Federated": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/YOUR_OIDC_PROVIDER_ID"
       },
       "Action": "sts:AssumeRoleWithWebIdentity",
       "Condition": {
         "StringEquals": {
-          "oidc.eks.us-east-1.amazonaws.com/id/31E0BE0E48C6BF612967EBEEE5C91B31:aud": "sts.amazonaws.com",
-          "oidc.eks.us-east-1.amazonaws.com/id/31E0BE0E48C6BF612967EBEEE5C91B31:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+          "oidc.eks.us-east-1.amazonaws.com/id/YOUR_OIDC_PROVIDER_ID:aud": "sts.amazonaws.com",
+          "oidc.eks.us-east-1.amazonaws.com/id/YOUR_OIDC_PROVIDER_ID:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
         }
       }
     }
