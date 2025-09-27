@@ -25,6 +25,36 @@ Through this application, I've implemented:
 - **RESTful API**: JSON endpoints for mobile/external integrations
 - **Responsive Design**: Mobile-friendly interface
 
+## 🏗️ Architecture Overview
+
+### Production Architecture
+![Production Architecture](generated-diagrams/personal-finance-architecture.png)
+
+This diagram shows my complete production setup on AWS EKS with:
+- **Load Balancing**: AWS ALB with NGINX Ingress Controller
+- **Container Orchestration**: Kubernetes with auto-scaling pods
+- **Data Persistence**: EBS volumes for database and file storage
+- **Monitoring**: Prometheus and Grafana for observability
+- **CI/CD**: GitOps with ArgoCD for automated deployments
+
+### Application Flow
+![Application Flow](generated-diagrams/application-flow-diagram.png)
+
+The application follows a clean multi-tier architecture:
+- **Frontend**: Responsive web interface with file upload capabilities
+- **Backend**: Flask REST API with business logic and authentication
+- **Data Layer**: PostgreSQL for transactions, Redis for caching, S3 for files
+- **Monitoring**: Comprehensive metrics and dashboards
+
+### CI/CD Pipeline
+![CI/CD Pipeline](generated-diagrams/cicd-pipeline-diagram.png)
+
+My GitOps workflow demonstrates modern DevOps practices:
+- **Automated Testing**: Every commit triggers comprehensive tests
+- **Container Building**: Multi-stage Docker builds with security scanning
+- **GitOps Deployment**: ArgoCD automatically syncs changes to Kubernetes
+- **Monitoring Integration**: Real-time metrics and alerting
+
 ## 🏗️ My Technical Stack
 
 ### Application Components
